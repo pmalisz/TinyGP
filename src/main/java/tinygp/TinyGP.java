@@ -261,12 +261,16 @@ public class TinyGP {
         double avgLength = (double)nodeCount / POP_SIZE;
         fitnessAvgPop /= POP_SIZE;
 
+        StringBuilder equation = new StringBuilder();
         System.out.print("Generation=" + gen + " Avg Fitness=" + (-fitnessAvgPop) +
                 " Best Fitness=" + (-fitnessBestPop) + " Avg Size=" + avgLength +
                 "\nBest Individual: ");
-        print_indiv(pop[best], 0);
+        print_indiv(pop[best], 0, equation);
 
-        System.out.print( "\n");
+        Optimizer o = new Optimizer();
+        String newEquation = o.optimize(equation.toString());
+
+        System.out.print(newEquation + "\n");
         System.out.flush();
     }
 
@@ -288,60 +292,60 @@ public class TinyGP {
         }
     }
 
-    int print_indiv(char[] buffer, int bufferCounter) {
+    int print_indiv(char[] buffer, int bufferCounter, StringBuilder eq) {
         int a1 = 0;
         boolean one_arg_function = false;
         if (buffer[bufferCounter] < OPERATIONS_START) {
             if (buffer[bufferCounter] < varNumber)
-                System.out.print("X" + (buffer[bufferCounter] + 1));
+                eq.append("X").append(buffer[bufferCounter] + 1);
             else
-                System.out.print(x[buffer[bufferCounter]]);
+                eq.append(x[buffer[bufferCounter]]);
 
             return ++bufferCounter;
         }
 
         switch (buffer[bufferCounter]) {
             case ADD:
-                System.out.print("(");
-                a1 = print_indiv(buffer, ++bufferCounter);
-                System.out.print(" + ");
+                eq.append("(");
+                a1 = print_indiv(buffer, ++bufferCounter, eq);
+                eq.append(" + ");
                 break;
             case SUB:
-                System.out.print("(");
-                a1 = print_indiv(buffer, ++bufferCounter);
-                System.out.print(" - ");
+                eq.append("(");
+                a1 = print_indiv(buffer, ++bufferCounter, eq);
+                eq.append(" - ");
                 break;
             case MUL:
-                System.out.print("(");
-                a1 = print_indiv(buffer, ++bufferCounter);
-                System.out.print(" * ");
+                eq.append("(");
+                a1 = print_indiv(buffer, ++bufferCounter, eq);
+                eq.append(" * ");
                 break;
             case DIV:
-                System.out.print("(");
-                a1 = print_indiv(buffer, ++bufferCounter);
-                System.out.print(" / ");
+                eq.append("(");
+                a1 = print_indiv(buffer, ++bufferCounter, eq);
+                eq.append(" / ");
                 break;
             case SIN:
-                System.out.print("(sin(");
-                a1 = print_indiv(buffer, ++bufferCounter);
+                eq.append("(sin(");
+                a1 = print_indiv(buffer, ++bufferCounter, eq);
                 one_arg_function = true;
-                System.out.print(")");
+                eq.append(")");
                 break;
             case COS:
-                System.out.print("(cos(");
-                a1 = print_indiv(buffer, ++bufferCounter);
+                eq.append("(cos(");
+                a1 = print_indiv(buffer, ++bufferCounter, eq);
                 one_arg_function = true;
-                System.out.print(")");
+                eq.append(")");
                 break;
         }
 
         if(!one_arg_function) {
-            int a2 = print_indiv(buffer, a1);
-            System.out.print(")");
+            int a2 = print_indiv(buffer, a1, eq);
+            eq.append(")");
             return a2;
         }
 
-        System.out.print(")");
+        eq.append(")");
         return a1;
     }
 
