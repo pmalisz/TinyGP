@@ -3,7 +3,7 @@ package tinygp;
 public class App 
 {
     public static void main(String[] args) {
-        String fileName = "examples/first1.txt";
+        String fileName = "examples/ex6.txt";
         long seed = -1;
 
         if ( args.length == 2 ) {
