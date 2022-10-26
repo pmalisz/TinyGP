@@ -25,7 +25,7 @@ public class TinyGP {
             OPERATIONS_END = COS;
     final int
             MAX_LEN = 10000,
-            POP_SIZE = 25000,
+            POP_SIZE = 100000,
             DEPTH = 5,
             GENERATIONS = 100,
             T_SIZE = 2;
