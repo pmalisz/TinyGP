@@ -25,7 +25,7 @@ public class TinyGP {
             OPERATIONS_END = COS;
     final int
             MAX_LEN = 10000,
-            POP_SIZE = 100000,
+            POP_SIZE = 25000,
             DEPTH = 5,
             GENERATIONS = 100,
             T_SIZE = 2;
@@ -35,6 +35,8 @@ public class TinyGP {
             EPSILON = -1e-5;
 
     // VAR
+    ExcelManager excelManager = new ExcelManager();
+    Optimizer optimizer = new Optimizer();
     static Random rd = new Random();
 
     char[][] pop;
@@ -49,6 +51,8 @@ public class TinyGP {
     double[][] targets;
 
     public TinyGP(String fileName, long s ) {
+        excelManager.setFilename(fileName);
+
         fitness =  new double[POP_SIZE];
 
         seed = s;
@@ -77,7 +81,7 @@ public class TinyGP {
             if (varNumber + randomNumber >= OPERATIONS_START)
                 System.out.println("too many variables and constants");
 
-            targets = new double[fitnessCases][varNumber +1];
+            targets = new double[fitnessCases][varNumber + 1];
 
             for (int i = 0; i < fitnessCases; i ++) {
                 line = in.readLine();
@@ -86,6 +90,7 @@ public class TinyGP {
                     targets[i][j] = Double.parseDouble(tokens.nextToken().trim());
             }
 
+            excelManager.setTargets(targets);
             in.close();
         }
         catch(FileNotFoundException e) {
@@ -203,6 +208,8 @@ public class TinyGP {
         stats(fitness, pop, 0);
         for (int gen = 1; gen < GENERATIONS; gen++) {
             if (fitnessBestPop > EPSILON) {
+                excelManager.writeToExcel();
+
                 System.out.print("PROBLEM SOLVED\n");
                 System.exit( 0 );
             }
@@ -225,6 +232,8 @@ public class TinyGP {
 
             stats( fitness, pop, gen);
         }
+
+        excelManager.writeToExcel();
 
         System.out.print("PROBLEM *NOT* SOLVED\n");
         System.exit(1);
@@ -267,10 +276,10 @@ public class TinyGP {
                 "\nBest Individual: ");
         print_indiv(pop[best], 0, equation);
 
-        Optimizer o = new Optimizer();
-        String newEquation = o.optimize(equation.toString());
+        String optEquation = optimizer.optimize(equation.toString());
 
-        System.out.print(newEquation + "\n");
+        excelManager.addBestIndividual(optEquation);
+        System.out.print(optEquation + "\n");
         System.out.flush();
     }
 
